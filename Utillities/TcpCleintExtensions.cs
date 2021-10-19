@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Utillities
 {
-    public static class TcpCleintExtensions
+    public static class TcpClientExtensions
     {
         public static void Send(this TcpClient client, string message)
         {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
@@ -10,6 +11,7 @@ namespace Utillities
     public class NetworkClient
     {
         private TcpClient _client;
+        private int _bufferSize = 2048;
 
         public NetworkClient()
         {
@@ -34,9 +36,24 @@ namespace Utillities
 
         public string Read()
         {
-            var buffer = new byte[1024];
-            var rdCnt = _client.GetStream().Read(buffer);
-            return Encoding.UTF8.GetString(buffer, 0, rdCnt);
+            //var buffer = new byte[1024];
+            //var rdCnt = _client.GetStream().Read(buffer);
+            //return Encoding.UTF8.GetString(buffer, 0, rdCnt);
+
+            var strm = _client.GetStream();
+            byte[] resp = new byte[_bufferSize];
+            using (var memStream = new MemoryStream())
+            {
+                int bytesread = 0;
+                do
+                {
+                    bytesread = strm.Read(resp, 0, resp.Length);
+                    memStream.Write(resp, 0, bytesread);
+
+                } while (bytesread == _bufferSize);
+
+                return Encoding.UTF8.GetString(memStream.ToArray());
+            }
         }
     }
 }
