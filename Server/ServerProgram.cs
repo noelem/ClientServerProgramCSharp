@@ -9,8 +9,8 @@ namespace Server
     {
         static void Main(string[] args)
         {
-            IPAddress ipAddress = Dns.Resolve("localhost").AddressList[0];
-            var server = new TcpListener(ipAddress, 5000);
+            //IPAddress ipAddress = Dns.Resolve("localhost").AddressList[0];
+            var server = new TcpListener(IPAddress.Loopback, 5000);
             server.Start();
             Console.WriteLine("Server started");
 
