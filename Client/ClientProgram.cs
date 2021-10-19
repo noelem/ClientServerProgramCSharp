@@ -20,7 +20,15 @@ namespace Client
             var msgBytes = Encoding.UTF8.GetBytes(message);
 
             stream.Write(msgBytes);
-           
+
+            var buffer = new byte[1024];
+
+            var rdCnt = stream.Read(buffer);
+
+            var response = Encoding.UTF8.GetString(buffer, 0, rdCnt);
+
+            Console.WriteLine($"Server response '{response}' and the read count was {rdCnt}");
+
         }
     }
 }
