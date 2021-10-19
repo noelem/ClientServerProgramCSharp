@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.Sockets;
+using System.Text;
 
 namespace Client
 {
@@ -12,9 +13,14 @@ namespace Client
 
             client.Connect("localhost", 5000);
 
+            var stream = client.GetStream();
 
-            
- 
+            var message = "hello";
+
+            var msgBytes = Encoding.UTF8.GetBytes(message);
+
+            stream.Write(msgBytes);
+           
         }
     }
 }
