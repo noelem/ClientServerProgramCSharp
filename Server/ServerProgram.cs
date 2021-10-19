@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using Utillities;
 
 namespace Server
 {
@@ -19,19 +20,22 @@ namespace Server
                 var client = server.AcceptTcpClient();
                 Console.WriteLine("Client accepted");
 
-                var stream = client.GetStream();
+                //var stream = client.GetStream();
 
-                var buffer = new byte[1024];
+                //var buffer = new byte[1024];
 
-                var rdCnt = stream.Read(buffer);
+                //var rdCnt = stream.Read(buffer);
 
-                var message = Encoding.UTF8.GetString(buffer, 0, rdCnt);
+                //var message = Encoding.UTF8.GetString(buffer, 0, rdCnt);
+
+                var message = client.Receive();
 
                 Console.WriteLine($"Client message '{message}' and the read count was {rdCnt}");
 
-                var response = Encoding.UTF8.GetBytes(message.ToUpper());
+                //var response = Encoding.UTF8.GetBytes(message.ToUpper());
+                //stream.Write(response);
 
-                stream.Write(response);
+                client.Send(message.ToUpper());
             }
 
         }
