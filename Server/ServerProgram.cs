@@ -16,14 +16,14 @@ namespace Server
 
             while (true)
             {
-                var client = server.AcceptTcpClient();
+                var client = new NetworkClient(server.AcceptTcpClient());
                 Console.WriteLine("Client accepted");
 
-                var message = client.Receive();
+                var message = client.Read();
 
                 Console.WriteLine($"Client message '{message}'");
 
-                client.Send(message.ToUpper());
+                client.Write(message.ToUpper());
             }
 
         }
