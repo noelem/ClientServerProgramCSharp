@@ -23,7 +23,7 @@ namespace Server
 
                 Console.WriteLine($"Client message '{message}'");
 
-                client.Write(message.ToUpper());
+                //client.Write(message.ToUpper());
             }
 
         }
