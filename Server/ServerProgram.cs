@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Text.Json;
 using Utillities;
 
 namespace Server
@@ -12,20 +13,26 @@ namespace Server
         {
             var server = new TcpListener(IPAddress.Loopback, 5000);
             server.Start();
-            Console.WriteLine("Server started noel");
+            Console.WriteLine("Server started");
 
             while (true)
             {
                 var client = new NetworkClient(server.AcceptTcpClient());
                 Console.WriteLine("Client accepted");
 
-                var message = client.Read();
+                var messageFromJson = client.Read();
+                var message = JsonSerializer.Deserialize<Request>(messageFromJson);
+                
+                System.Console.WriteLine(message);
 
-                Console.WriteLine($"Client message '{message}'");
-
-                //client.Write(message.ToUpper());
             }
 
         }
-    }
+    
+        //requestHandler()
+
+
+
+
+    }    
 }
