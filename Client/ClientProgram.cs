@@ -15,7 +15,7 @@ namespace Client
 
             client.Connect("localhost", 5000);
 
-            var message = "hello";
+            var message = "helloTest";
             client.Write(message);
 
             var response = client.Read();
