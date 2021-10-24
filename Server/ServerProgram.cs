@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -42,7 +43,8 @@ namespace Server
                 Console.WriteLine(message.Body);
                 string returns = JsonConvert.SerializeObject(RequestHandler(message));
                 Console.WriteLine(returns);
-                client.Write(returns);
+                client.Write(returns.ToLower());
+                //client.Write("{\"status\":\"4 bad request\", \"body\":null}");
             }
 
         }
@@ -52,23 +54,23 @@ namespace Server
             response.Status += "4";
             if (r.Method == null) { response.Status += " missing method"; }
             if (r.Date == null) { response.Status += " missing date"; }
-            if (r.Path == null) { response.Status += " missing path"; }
+            if (r.Path == null) { response.Status += " missing resource"; }
             switch (r.Method)
             {
                 case "update":
-                    ValidateUpdate(r);
+                    response.Status += !ValidateUpdate(r) ? " bad request" : " ok";
                     break;
 
                 case "create":
-                    ValidateUpdate(r);
+                    response.Status += !ValidateCreate(r) ? " bad request" : " ok";
                     break;                
                 
                 case "delete":
-                    ValidateUpdate(r);
+                    response.Status += !ValidateDelete(r) ? " bad request" : " ok";
                     break;     
                     
                 case "read":
-                    ValidateUpdate(r);
+                    response.Status += !ValidateRead(r) ? " bad request" : " ok";
                     break;
             }
                
@@ -83,18 +85,24 @@ namespace Server
 
         static bool ValidateUpdate(Request r)
         {
+            if (r.Path == null) return false;
             return false;
         }        
         static bool ValidateCreate(Request r)
         {
-            return false;
+            if (r.Path == null) return false;
+            if (r.Path.Any(char.IsDigit)) return false; //if there is an id in the path, we deny the request. WE controll the ids, muahaha
+            return true;
         }        
         static bool ValidateDelete(Request r)
         {
-            return false;
+            if (r.Path == null) return false;
+            if (!r.Path.Any(char.IsDigit)) return false; //an id needs to be provided, cant delete nothing
+            return true;
         }        
         static bool ValidateRead(Request r)
         {
+            if (r.Path == null) return false;
             return false;
         }
 
