@@ -7,7 +7,6 @@ using System.Text.Json.Serialization;
 
 namespace Utillities
 {
-    
     public class Response
     {
         public string Status { get; set; }
@@ -24,6 +23,7 @@ namespace Utillities
    
         [JsonConstructor]
         public Request(string Method, string Path, string Body, string Date) {
+
    
             this.Method = Method;
             this.Path = Path;
@@ -39,7 +39,8 @@ namespace Utillities
             Path = this.Path;
             Date = DateTime.Now;
             
-        }*/
+        }
+        */
 
     }
 }

@@ -54,6 +54,7 @@ namespace Server
                 Console.WriteLine($"Recieved message: {messageFromJson}");
                 Request message = JsonConvert.DeserializeObject<Request>(messageFromJson, settings);
 
+
                 var serializerSettings = new JsonSerializerSettings();
                 serializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
                 string returns = JsonConvert.SerializeObject(RequestHandler(message), serializerSettings);
@@ -62,7 +63,6 @@ namespace Server
                 client.Write(returns);
                 //client.Write("{\"status\":\"4 bad request\", \"body\":null}");
             }
-
         }
         static Response RequestHandler(Request r)
         {
