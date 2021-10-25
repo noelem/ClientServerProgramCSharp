@@ -14,7 +14,7 @@ using Xunit;
 
 namespace Assignment3TestSuite
 {
-
+    
     public class Response
     {
         public string Status { get; set; }

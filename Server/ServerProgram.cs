@@ -21,17 +21,17 @@ namespace Server
                 Console.WriteLine("Client accepted");
 
                 var messageFromJson = client.Read();
-                var message = JsonSerializer.Deserialize<Request>(messageFromJson);
+                System.Console.WriteLine(messageFromJson); // works
+
+                //var message = JsonSerializer.Deserialize<Request>(messageFromJson);
+                var test = JsonSerializer.Deserialize<Request>(messageFromJson);
                 
-                System.Console.WriteLine(message);
+                Console.WriteLine(test);
 
             }
-
         }
     
         //requestHandler()
-
-
 
 
     }    
