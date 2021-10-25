@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -23,11 +24,16 @@ namespace Server
             delete,
             echo
         }
+        public static List<Category> categories = new List<Category>() ;
         static void Main(string[] args)
         {
             var server = new TcpListener(IPAddress.Loopback, 5000);
             server.Start();
             Console.WriteLine("Server started");
+
+            categories.Add(new Category { Id = 1, Name = "Beverages" });
+            categories.Add(new Category { Id = 2, Name = "Condiments" });
+            categories.Add(new Category { Id = 3, Name = "Confections" });
 
             while (true)
             {
@@ -45,17 +51,14 @@ namespace Server
                         }
                     }
                 };
-                Console.WriteLine($"Message: {messageFromJson}");
+                Console.WriteLine($"Recieved message: {messageFromJson}");
                 Request message = JsonConvert.DeserializeObject<Request>(messageFromJson, settings);
 
-                Console.WriteLine(message.Method);
-                Console.WriteLine(message.Path);
-                Console.WriteLine(message.Date);
-                Console.WriteLine(message.Body);
                 var serializerSettings = new JsonSerializerSettings();
                 serializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
                 string returns = JsonConvert.SerializeObject(RequestHandler(message), serializerSettings);
-                Console.WriteLine(returns);
+                
+                Console.WriteLine($"Sent message back: {returns}");
                 client.Write(returns);
                 //client.Write("{\"status\":\"4 bad request\", \"body\":null}");
             }
@@ -83,7 +86,7 @@ namespace Server
             }
             if (r.Path == null) { response.Status += " missing resource"; }
             if (r.Body == null) {
-                if(r.Method != "read")
+                if(r.Method != "read" && r.Method != "delete")
                 {
                     response.Status += " missing body";
                 }
@@ -103,6 +106,22 @@ namespace Server
             {
                 case "update":
                     response.Status += !ValidateUpdate(r) ? " bad request" : " ok";
+                    if (response.Status.Contains("ok") && !response.Status.Contains("illegal body"))
+                    {
+                        int toUpdate = categories.FindIndex(c => c.Id.ToString() == r.Path.Split("/")[3]);
+                        if (toUpdate != -1) // -1 means not found in our list
+                        {
+                            Console.WriteLine(toUpdate);
+                            Category updatedValues = FromJson<Category>(r.Body);
+                            Console.WriteLine(updatedValues.Name);
+                            Console.WriteLine(updatedValues.Id);
+                            categories[toUpdate] = updatedValues;
+                            response.Status = "3 updated";
+                        } else
+                        {
+                            response.Status = "5 not found";
+                        }
+                    }
                     break;
 
                 case "create":
@@ -113,10 +132,40 @@ namespace Server
                 
                 case "delete":
                     response.Status += !ValidateDelete(r) ? " bad request" : " ok";
+                    if (response.Status.Contains("ok"))
+                    {
+                        if (!categories.Any(c => c.Id.ToString() == r.Path.Split("/")[3]))
+                        {
+                            response.Status = "5 not found";
+                        }
+                        else
+                        {
+                            response.Status = DeleteMethodHandler(r); //all checks passed, delete the 
+                        }
+                    }
                     break;     
                     
                 case "read":
-                    response.Status += !ValidateRead(r) ? " bad request" : " ok";
+                    response.Status += !ValidateRead(r) ? " bad request" : "1 ok";
+                    if (response.Status.Contains("ok"))
+                    {
+                        if (r.Path.EndsWith("api/categories")) //read all categories
+                        {
+                            response.Status = "1 Ok";
+                            response.Body = ToJson(categories);
+                            break;
+                        }
+                        if (!categories.Any(c => c.Id.ToString() == r.Path.Split("/")[3]))
+                        {
+                            response.Status = "5 not found";
+                        }
+                        else
+                        {
+                            response.Status = "1 Ok";
+                            response.Body = categories.Find(c => c.Id.ToString() == r.Path.Split("/")[3]).ToJson();
+                        }
+                    }
+
                     break;
 
                 case "echo":
@@ -129,16 +178,24 @@ namespace Server
         static Response CreateMethodHandler(Request r)
         {
             Category c1 = JsonConvert.DeserializeObject<Category>(r.Body);
-            Category c = new Category { Id = 1, Name = c1.Name };
-            
-            return new Response() { Status = " ok", Body = Regex.Unescape(JsonConvert.SerializeObject(c)) };
+            Category c = new Category { Id = categories.Count, Name = c1.Name };
+            categories.Add(c);
+
+            return new Response() { Status = " ok", Body = c.ToJson() };
+        }
+        static string DeleteMethodHandler(Request r)
+        {
+            int idToDelete = int.Parse(r.Path.Split("/")[3]);
+            categories.RemoveAll(c => c.Id == idToDelete);
+            return "1 ok";
         }
 
         static bool ValidateUpdate(Request r)
         {
             if (r.Path == null) return false;
             if (r.Body == null) return false;
-            return false;
+            if (!r.Path.StartsWith("/api/categories/")) return false;
+            return true;
         }        
         static bool ValidateCreate(Request r)
         {
@@ -156,13 +213,27 @@ namespace Server
         static bool ValidateRead(Request r)
         {
             if (r.Path == null) return false;
-            if (!r.Path.StartsWith("/api/categories/")) return false;
-            return false;
+            if (!r.Path.StartsWith("/api/categories")) return false;
+            if (r.Path.EndsWith("/api/categories")) return true;
+            if (!r.Path.Any(char.IsDigit)) return false;
+            return true;
         }
-
+        public static string ToJson(List<Category> r)
+        {
+            return System.Text.Json.JsonSerializer.Serialize(r, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+        }
+        public static T FromJson<T>(string element)
+        {
+            return System.Text.Json.JsonSerializer.Deserialize<T>(element, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+        }
     }
     public class Category
     {
+        public string ToJson()
+        {
+            return System.Text.Json.JsonSerializer.Serialize(this, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+        }
+
         [JsonPropertyName("cid")]
         public int Id { get; set; }
         [JsonPropertyName("name")]

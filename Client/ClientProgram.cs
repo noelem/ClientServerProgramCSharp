@@ -15,9 +15,9 @@ namespace Client
             var client = new NetworkClient();
             client.Connect("localhost", 5000);
 
-            var message = new Request("thisMethod", "thisPath", "thisBody");
+            var message = new Request("thisMethod", "thisPath", "thisBody", DateTime.Now.ToString());
 
-            var messageAsJson = JsonSerializer.Serialize<Request>(message);
+            var messageAsJson = JsonSerializer.Serialize(message);
             client.Write(messageAsJson);
 
             var response = client.Read();
