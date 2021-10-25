@@ -61,7 +61,6 @@ namespace Server
                 
                 Console.WriteLine($"Sent message back: {returns}");
                 client.Write(returns);
-                //client.Write("{\"status\":\"4 bad request\", \"body\":null}");
             }
         }
         static Response RequestHandler(Request r)
