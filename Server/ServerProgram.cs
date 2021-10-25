@@ -140,7 +140,7 @@ namespace Server
                         }
                         else
                         {
-                            response.Status = DeleteMethodHandler(r); //all checks passed, delete the 
+                            response.Status = DeleteMethodHandler(r);
                         }
                     }
                     break;     
@@ -201,13 +201,13 @@ namespace Server
         {
             if (r.Path == null) return false;
             if (r.Body == null) return false;
-            if (r.Path.Any(char.IsDigit)) return false; //if there is an id in the path, we deny the request. WE controll the ids, muahaha
+            if (r.Path.Any(char.IsDigit)) return false; //if there is an id in the path, we deny the request.
             return true;
         }        
         static bool ValidateDelete(Request r)
         {
             if (r.Path == null) return false;
-            if (!r.Path.Any(char.IsDigit)) return false; //an id needs to be provided, cant delete nothing
+            if (!r.Path.Any(char.IsDigit)) return false; //an id needs to be provided.
             return true;
         }        
         static bool ValidateRead(Request r)
