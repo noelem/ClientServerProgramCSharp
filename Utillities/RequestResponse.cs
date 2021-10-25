@@ -31,16 +31,5 @@ namespace Utillities
             this.Date = Date;
             
         }
-
-        /*
-        public Request(string Method, string Path , DateTime Date) {
-   
-            Method = this.Method;
-            Path = this.Path;
-            Date = DateTime.Now;
-            
-        }
-        */
-
     }
 }
