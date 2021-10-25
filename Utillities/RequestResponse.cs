@@ -19,15 +19,16 @@ namespace Utillities
         public string Method { get; set; }
         public String Path { get; set; }
         public String Body { get; set; }
-        //public DateTime Date { get; set; }
+        public String Date { get; set; }
    
         [JsonConstructor]
-        public Request(string Method, string Path, string Body) {
+        public Request(string Method, string Path, string Body, string Date) {
+
    
             this.Method = Method;
             this.Path = Path;
             this.Body = Body;
-            //this.Date = DateTime.Now;
+            this.Date = Date;
             
         }
 
