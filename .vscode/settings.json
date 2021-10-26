@@ -1,0 +1,5 @@
+{
+    //"dotnet-test-explorer.testProjectPath": "Assignment3TestSuite" works
+    //"dotnet-test-explorer.testProjectPath": "**/*Test.@(csproj|vbproj|fsproj)" works
+    //"dotnet-test-explorer.testProjectPath": "+(Assignment3TestSuite)" works
+}
